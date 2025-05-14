@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <form action="/generate" method="POST">
+                <h2>Generate Your Quiz</h2>
+
+                <label for="country">Country:</label>
+                <select id="country" name="country" required>
+                    <option value="" disabled selected>Select Country</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="China">China</option>
+                </select>
+
+                <label for="subject">Subject:</label>
+                <select id="subject" name="subject" required>
+                    <option value="" disabled selected>Select Subject</option>
+                    <option value="Math">Math</option>
+                    <option value="Swedish">Swedish</option> 
+                    <option value="Chinese">Chinese</option>        
+                    <option value="Science">Science</option>
+                    <option value="History">History</option>
+                    <option value="English">English</option>
+                </select>
+
+                <label for="grade">Grade Level:</label>
+                <select id="grade" name="grade" required>
+                    <option value="" disabled selected>Select Grade</option>
+                    <option value="1">Grade 1</option>
+                    <option value="2">Grade 2</option>
+                    <option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option>
+                    <option value="5">Grade 5</option>
+                    <option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option>
+                    <option value="8">Grade 8</option>
+                    <option value="9">Grade 9</option>
+                </select>
+
+                <label for="difficulty">Difficulty:</label>
+                <select id="difficulty" name="difficulty" required>
+                    <option value="" disabled selected>Select Difficulty</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+
+                <label for="time">Time:</label>
+                <select id="time" name="time" required>
+                    <option value="" disabled selected>Select Time</option>
+                    <option value="15 minutes">15 mins</option>
+                    <option value="30 minutes">30 mins</option>
+                    <option value="45 minutes">45 mins</option>
+                </select>
+
+                <label for="language">Translation:</label>
+                <select id="language" name="language">
+                    <option value="" selected>None</option>
+                    <option value="English">English</option>
+                    <option value="Swedish">Swedish</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+
+                <button type="submit">📝 Generate Quiz</button>
+            </form>
+            <button style="width: 100%; margin-top: 10px;" onclick="exportToPDF()">📄 Export to PDF</button>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="main-content">
+            {% if quiz_problem %}
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin: 0;">📝 Generated Quiz – {{ subject }}, Grade {{ grade }}</h2>
+                    <div>
+                        <button onclick="exportToPDF()">📄 Export to PDF</button>
+                        <button onclick="savePage()">💾 Save Page</button>
+                    </div>
+                </div>
+                <div class="quiz-pages" >
+                    <section class="quiz-page" id="question-page">
+                        <h3>📄 Problem Set</h3>
+                        <div class="quiz-block">{{ quiz_problem|safe }}</div>
+                    </section>
+                    <section class="quiz-page" id="answer-page">
+                        <h3>✅ Answer Key</h3>
+                        <div class="quiz-block">{{ quiz_answer|safe }}</div>
+                    </section>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+
+<script>
+    // Function to save the current page as an HTML file
+    function savePage() {
+        const htmlContent = document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "page_dump.html";
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // Function to export the quiz pages to PDF
+    function exportToPDF() {
+        // Clone the target content
+        const clone = document.createElement('div');
+        clone.style.width = '210mm'; // A4 width
+        clone.style.minHeight = '297mm'; // A4 height
+        clone.style.boxSizing = 'border-box';
+        // clone.style.fontSize = '10px';
+        clone.style.lineHeight = '1.2'; // Adjust line height for better readability
+        clone.style.padding = '0px';           // Smaller padding
+        clone.style.margin = '0';
+        clone.style.fontFamily = 'Arial, sans-serif'; // Arial is more compact than sans-serif default
+        clone.style.backgroundColor = 'white';
+
+        // clone.querySelectorAll('ol, ul').forEach(list => {
+        //     list.style.paddingLeft = '16px'; // reduce left indent
+        // });
+
+        // Copy relevant parts
+        const question = document.getElementById('question-page').cloneNode(true);
+        const answer = document.getElementById('answer-page').cloneNode(true);
+
+        // Remove margin from h1/h3/p, ol/ul/li
+        question.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ol,ul,li').forEach(el => {
+            el.style.margin = '0px 0';
+            el.style.padding = '0';
+        });
+
+        question.querySelectorAll('section').forEach(section => {
+            section.style.marginBottom = '0px';
+        });
+
+        // Fix content formatting: remove <p> inside <li>
+        [question, answer].forEach(section => {
+            section.querySelectorAll('li > p').forEach(p => {
+                const li = p.parentElement;
+                li.innerHTML = p.innerHTML; // move p content to li directly
+            });
+        });
+
+        const pageBreak = document.createElement('div');
+        pageBreak.style.pageBreakAfter = 'always';
+        // pageBreak.style.breakAfter = 'page'; // for modern CSS
+        // pageBreak.style.height = '0'; // avoid any visible line
+        // pageBreak.style.margin = '0';
+        // pageBreak.style.border = 'none'; // just in case
+
+        // Append to clone container
+        clone.appendChild(question);
+        clone.appendChild(pageBreak);
+        clone.appendChild(answer);
+
+        // Add to body temporarily for rendering
+        document.body.appendChild(clone);
+
+        // Generate the PDF
+        html2pdf(clone, {
+            margin: 0,
+            filename: 'quiz_with_answers.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                scrollY: 0
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        }).then(() => {
+            document.body.removeChild(clone); // clean up
+        });
+    }
+</script>
+</html>

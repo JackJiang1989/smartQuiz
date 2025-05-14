@@ -1,0 +1,537 @@
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Generator</title>
+    <link rel="stylesheet" href="./static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+    <style class="automa-element-selector">@font-face { font-family: "Inter var"; font-weight: 100 900; font-display: swap; font-style: normal; font-named-instance: "Regular"; src: url("chrome-extension://infppggnoaenmfagbfknfkancpbljcca/Inter-roman-latin.var.woff2") format("woff2") }
+    .automa-element-selector { direction: ltr } 
+    [automa-isDragging] { user-select: none } 
+    [automa-el-list] {outline: 2px dashed #6366f1;}
+    .page-break {
+      page-break-before: always;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <form action="/generate" method="POST">
+                <h2>Generate Your Quiz</h2>
+
+                <label for="country">Country:</label>
+                <select id="country" name="country" required="">
+                    <option value="" disabled="" selected="">Select Country</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="China">China</option>
+                </select>
+
+                <label for="subject">Subject:</label>
+                <select id="subject" name="subject" required="">
+                    <option value="" disabled="" selected="">Select Subject</option>
+                    <option value="Math">Math</option>
+                    <option value="Swedish">Swedish</option> 
+                    <option value="Chinese">Chinese</option>        
+                    <option value="Science">Science</option>
+                    <option value="History">History</option>
+                    <option value="English">English</option>
+                </select>
+
+                <label for="grade">Grade Level:</label>
+                <select id="grade" name="grade" required="">
+                    <option value="" disabled="" selected="">Select Grade</option>
+                    <option value="1">Grade 1</option>
+                    <option value="2">Grade 2</option>
+                    <option value="3">Grade 3</option>
+                    <option value="4">Grade 4</option>
+                    <option value="5">Grade 5</option>
+                    <option value="6">Grade 6</option>
+                    <option value="7">Grade 7</option>
+                    <option value="8">Grade 8</option>
+                    <option value="9">Grade 9</option>
+                </select>
+
+                <label for="difficulty">Difficulty:</label>
+                <select id="difficulty" name="difficulty" required="">
+                    <option value="" disabled="" selected="">Select Difficulty</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+
+                <label for="time">Time:</label>
+                <select id="time" name="time" required="">
+                    <option value="" disabled="" selected="">Select Time</option>
+                    <option value="15 minutes">15 mins</option>
+                    <option value="30 minutes">30 mins</option>
+                    <option value="45 minutes">45 mins</option>
+                </select>
+
+                <label for="language">Translation:</label>
+                <select id="language" name="language">
+                    <option value="" selected="">None</option>
+                    <option value="English">English</option>
+                    <option value="Swedish">Swedish</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+
+                <button type="submit">Generate Quiz</button>
+                
+            </form>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="main-content">
+            
+                <!-- <button onclick="exportToPDF()">📄 Export Quiz to PDF</button> -->
+                <button onclick="exportToPDF()" style="margin-top: 20px;">Export to PDF</button>
+                <button onclick="savePage()">Save Page</button>
+                <h2>📝 Generated Quiz – History, Grade 3</h2>
+                <div class="quiz-pages" >
+                    <section class="quiz-page" id="question-page">
+                        <h3>📄 Problem Set</h3>
+                        <div class="quiz-block"><p>Okay, here's a history quiz designed for Grade 3 in Sweden, with a "Hard" difficulty level, formatted for A4 printing, including Swedish questions with English translations.</p>
+<h3>Page 1: Problem Set</h3>
+<p><strong>Quiz – History, Grade 3 – Hard</strong></p>
+<p>✏️ <strong>Section 1: Sant eller Falskt? (True or False?)</strong></p>
+<ol>
+<li>
+<p>Vikingarna var de första människorna som bodde i Sverige.
+    <strong>[Translation in English]</strong> The Vikings were the first people to live in Sweden.</p>
+</li>
+<li>
+<p>Sverige har alltid varit ett kungarike.
+    <strong>[Translation in English]</strong> Sweden has always been a kingdom.</p>
+</li>
+<li>
+<p>Gustav Vasa var en berömd svensk kock.
+    <strong>[Translation in English]</strong> Gustav Vasa was a famous Swedish chef.</p>
+</li>
+</ol>
+<p>📚 <strong>Section 2: Flervalsfrågor (Multiple Choice Questions)</strong></p>
+<ol>
+<li>
+<p>Vilket århundrade började vikingatiden ungefär?
+    a) 700-talet b) 800-talet c) 900-talet d) 1000-talet
+    <strong>[Translation in English]</strong> In which century did the Viking Age roughly begin?
+    a) 7th century b) 8th century c) 9th century d) 10th century</p>
+</li>
+<li>
+<p>Vad kallades de svenska kungarna under vikingatiden ofta?
+    a) Jarlar b) Hövdingar c) Påvar d) Kejsare
+    <strong>[Translation in English]</strong> What were the Swedish kings often called during the Viking Age?
+    a) Earls b) Chieftains c) Popes d) Emperors</p>
+</li>
+<li>
+<p>Vilken av följande händelser markerar slutet på Kalmarunionen?
+    a) Stockholms blodbad b) Gustav Vasas kröning c) Freden i Roskilde d) Karl XII:s död
+    <strong>[Translation in English]</strong> Which of the following events marks the end of the Kalmar Union?
+    a) Stockholm Bloodbath b) Gustav Vasa's coronation c) Peace of Roskilde d) Charles XII's death</p>
+</li>
+</ol>
+<p>🧠 <strong>Section 3: Tidslinje (Timeline)</strong></p>
+<ol>
+<li>Ordna följande händelser i rätt tidsföljd (skriv 1, 2, 3 bredvid):<ul>
+<li>___ Gustav Vasa blir kung av Sverige.</li>
+<li>___ Vikingatiden börjar.</li>
+<li>___ Sverige går med i Europeiska Unionen (EU).
+<strong>[Translation in English]</strong> Arrange the following events in the correct chronological order (write 1, 2, 3 next to them):</li>
+<li>___ Gustav Vasa becomes King of Sweden.</li>
+<li>___ The Viking Age begins.</li>
+<li>___ Sweden joins the European Union (EU).</li>
+</ul>
+</li>
+</ol>
+<p>✅ <strong>Section 4: Öppen fråga (Open Question)</strong></p>
+<ol>
+<li>Beskriv kortfattat varför Gustav Vasa är en viktig person i svensk historia.
+    <strong>[Translation in English]</strong> Briefly describe why Gustav Vasa is an important figure in Swedish history.</li>
+</ol>
+<h3></h3></div>
+                    </section>
+                    <section class="quiz-page" id="answer-page">
+                        <h3>✅ Answer Key</h3>
+                        <div class="quiz-block"><p>Page 2: Answer Key</p>
+<p><strong>Answer Key – History, Grade 3</strong></p>
+<ol>
+<li>
+<p>Falskt (False)
+    <strong>[Translation in English]</strong> False. There were people living in Sweden before the Vikings.</p>
+</li>
+<li>
+<p>Falskt (False)
+    <strong>[Translation in English]</strong> False. Sweden has been a kingdom, but has also been part of unions.</p>
+</li>
+<li>
+<p>Falskt (False)
+    <strong>[Translation in English]</strong> False. Gustav Vasa was a king.</p>
+</li>
+<li>
+<p>b) 800-talet
+    <strong>[Translation in English]</strong> b) 8th century</p>
+</li>
+<li>
+<p>b) Hövdingar
+    <strong>[Translation in English]</strong> b) Chieftains</p>
+</li>
+<li>
+<p>a) Stockholms blodbad
+    <strong>[Translation in English]</strong> a) Stockholm Bloodbath</p>
+</li>
+<li>
+<ul>
+<li>2 Gustav Vasa blir kung av Sverige.</li>
+<li>1 Vikingatiden börjar.</li>
+<li>3 Sverige går med i Europeiska Unionen (EU).
+<strong>[Translation in English]</strong></li>
+<li>2 Gustav Vasa becomes King of Sweden.</li>
+<li>1 The Viking Age begins.</li>
+<li>3 Sweden joins the European Union (EU).</li>
+</ul>
+</li>
+<li>
+<p>Gustav Vasa är viktig eftersom han befriade Sverige från danskt styre och blev Sveriges kung. Han lade grunden för ett självständigt Sverige.
+    <strong>[Translation in English]</strong> Gustav Vasa is important because he liberated Sweden from Danish rule and became King of Sweden. He laid the foundation for an independent Sweden.</p>
+</li>
+</ol></div>
+                    </section>
+                </div>
+            
+        </main>
+    </div>
+
+
+
+<script>
+    // Function to save the current page as an HTML file
+    function savePage() {
+        const htmlContent = document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "page_dump.html";
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // // Function to export the quiz pages to PDF
+    // function exportToPDF() {
+    //     const { jsPDF } = window.jspdf;
+
+    //     // Create a new jsPDF instance
+    //     const doc = new jsPDF();
+
+    //     // Function to add content to PDF and handle page breaks
+    //     function addPageContent(pageId, title) {
+    //         const pageContent = document.getElementById(pageId).innerHTML;
+    //         doc.setFont("helvetica", "normal");
+    //         doc.setFontSize(12);
+
+    //         // Add the page title
+    //         doc.text(title, 10, 10);
+
+    //         // Convert the HTML content to text and add it to the PDF
+    //         doc.html(pageContent, {
+    //             callback: function (doc) {
+    //                 // After rendering, check if we need another page
+    //                 if (doc.getY() > 250) { // If content is too long
+    //                     doc.addPage(); // Add a new page
+    //                 }
+    //             },
+    //             x: 10,
+    //             y: 20,
+    //             html2canvas: {
+    //                 scale: 2, // Ensures better resolution of images, etc.
+    //                 useCORS: true // Allow cross-origin images (if any)
+    //             }
+    //         });
+    //     }
+
+    //     // Add Question Page
+    //     addPageContent('question-page', 'Quiz – Svenska, Årskurs 3 – Medel');
+
+    //     // Add Answer Page
+    //     doc.addPage(); // Add a new page for the answer
+    //     addPageContent('answer-page', 'Answer Key – Svenska, Årskurs 3');
+
+    //     // Save the PDF file
+    //     doc.save('quiz_answer.pdf');
+    // }
+
+    const A4_HEIGHT_PX = 1123; // A4 height in pixels at scale=1
+    const canvasScale = 2;
+    const maxHeightPx = A4_HEIGHT_PX * canvasScale;
+
+    function exportToPDF1() {
+        const element = document.getElementById("question-page");
+
+        // Temporarily make it visible and measure it
+        element.style.transform = "";
+        element.style.transformOrigin = "top left";
+
+        // Wait for layout
+        setTimeout(() => {
+            const contentHeight = element.offsetHeight;
+            const scaleFactor = Math.min(1, maxHeightPx / contentHeight);
+
+            // Apply scale
+            element.style.transform = `scale(${scaleFactor})`;
+            element.style.width = `${100 / scaleFactor}%`; // Prevent content from being cut off
+
+            const opt = {
+                margin: 0,
+                filename: 'auto-squeezed.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Flatten <li><p> to look more inline (remove extra spacing)
+            const listParagraphs = document.querySelectorAll("#question-page ol li p");
+
+            listParagraphs.forEach(p => {
+                p.style.margin = "0";
+                p.style.display = "inline"; // Treat <p> as inline within <li>
+            });
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Reset style
+                element.style.transform = "";
+                element.style.width = "";
+            });
+
+        }, 100); // Allow DOM to settle
+    }
+
+
+function exportToPDF() {
+    // Clone the target content
+    const clone = document.createElement('div');
+    clone.style.width = '210mm'; // A4 width
+    clone.style.minHeight = '297mm'; // A4 height
+    clone.style.boxSizing = 'border-box';
+    // clone.style.fontSize = '10px';
+    clone.style.lineHeight = '1.2'; // Adjust line height for better readability
+    clone.style.padding = '0px';           // Smaller padding
+    clone.style.margin = '0';
+    clone.style.fontFamily = 'Arial, sans-serif'; // Arial is more compact than sans-serif default
+    clone.style.backgroundColor = 'white';
+
+    // clone.querySelectorAll('ol, ul').forEach(list => {
+    //     list.style.paddingLeft = '16px'; // reduce left indent
+    // });
+
+    // Copy relevant parts
+    const question = document.getElementById('question-page').cloneNode(true);
+    const answer = document.getElementById('answer-page').cloneNode(true);
+
+    // Remove margin from h1/h3/p, ol/ul/li
+    question.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ol,ul,li').forEach(el => {
+        el.style.margin = '0px 0';
+        el.style.padding = '0';
+    });
+
+    question.querySelectorAll('section').forEach(section => {
+        section.style.marginBottom = '0px';
+    });
+
+    // Fix content formatting: remove <p> inside <li>
+    [question, answer].forEach(section => {
+        section.querySelectorAll('li > p').forEach(p => {
+            const li = p.parentElement;
+            li.innerHTML = p.innerHTML; // move p content to li directly
+        });
+    });
+
+    const pageBreak = document.createElement('div');
+    pageBreak.style.pageBreakAfter = 'always';
+    // pageBreak.style.breakAfter = 'page'; // for modern CSS
+    // pageBreak.style.height = '0'; // avoid any visible line
+    // pageBreak.style.margin = '0';
+    // pageBreak.style.border = 'none'; // just in case
+
+    // Append to clone container
+    clone.appendChild(question);
+    clone.appendChild(pageBreak);
+    clone.appendChild(answer);
+
+    // Add to body temporarily for rendering
+    document.body.appendChild(clone);
+
+    // Generate the PDF
+    html2pdf(clone, {
+        margin: 0,
+        filename: 'quiz_with_answers.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            scrollY: 0
+        },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        }
+    }).then(() => {
+        document.body.removeChild(clone); // clean up
+    });
+}
+function exportToPDF1() {
+    // Clone question and answer content separately
+    const question = document.getElementById('question-page').cloneNode(true);
+    const answer = document.getElementById('answer-page').cloneNode(true);
+
+    // Clean formatting
+    [question, answer].forEach(section => {
+        section.style.width = '210mm';
+        section.style.minHeight = '297mm';
+        section.style.boxSizing = 'border-box';
+        section.style.fontSize = '10px';
+        section.style.lineHeight = '1';
+        section.style.padding = '10px';
+        section.style.margin = '0';
+        section.style.fontFamily = 'Arial, sans-serif';
+
+        section.querySelectorAll('li > p').forEach(p => {
+            const li = p.parentElement;
+            li.innerHTML = p.innerHTML;
+        });
+
+        section.querySelectorAll('h1,h2,h3,h4,h5,h6,p,ol,ul,li').forEach(el => {
+            el.style.margin = '4px 0';
+            el.style.padding = '0';
+        });
+
+        section.querySelectorAll('section').forEach(sec => {
+            sec.style.marginBottom = '8px';
+        });
+    });
+
+    // Create off-screen container
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    document.body.appendChild(container);
+
+    // Append the first page (question) to container and render it
+    container.appendChild(question);
+    html2pdf().from(question)
+        .set({
+            margin: 0,
+            filename: 'quiz_with_answers.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        })
+        .toPdf()
+        .get('pdf')
+        .then(pdf => {
+            pdf.addPage(); // ➕ new blank page
+        })
+        .then(() => {
+            container.innerHTML = ''; // Clear previous content
+            container.appendChild(answer);
+            return html2pdf().from(answer).toContainer().toCanvas().toPdf().get('pdf');
+        })
+        .then(() => {
+            document.body.removeChild(container); // clean up
+        });
+}
+</script>
+
+<!-- 
+<script>
+async function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const pageIds = ['question-page', 'answer-page'];
+
+    let pdf;
+
+    for (let i = 0; i < pageIds.length; i++) {
+        const element = document.getElementById(pageIds[i]);
+        if (!element) continue;
+
+        const clone = element.cloneNode(true);
+        clone.style.width = '800px';
+        clone.style.padding = '20px';
+        clone.style.position = 'absolute';
+        clone.style.top = '-9999px';
+        clone.style.left = '-9999px';
+        clone.style.backgroundColor = 'white';
+        document.body.appendChild(clone);
+
+        const canvas = await html2canvas(clone, {
+            scale: 2,
+            useCORS: true
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+
+        if (i === 0) {
+            // Create PDF with page size matching canvas size
+            pdf = new jsPDF({
+                orientation: imgWidth > imgHeight ? 'landscape' : 'portrait',
+                unit: 'px',
+                format: [imgWidth, imgHeight]
+            });
+        } else {
+            pdf.addPage([imgWidth, imgHeight]);
+        }
+
+        pdf.setPage(i + 1);
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        document.body.removeChild(clone);
+    }
+
+    if (pdf) pdf.save('quiz.pdf');
+}
+</script> --><!-- <script>
+function exportToPDF() {
+    // Export question page
+    const questionPage = document.getElementById('question-page');
+    const answerPage = document.getElementById('answer-page');
+
+    // Create PDFs with proper dimensions
+    const pdfOptions = {
+        margin: 10,
+        filename: 'quiz.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Export question page
+    html2canvas(questionPage).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF(pdfOptions.jsPDF);
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save('questions.pdf');
+    });
+
+    // Export answer page
+    html2canvas(answerPage).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF(pdfOptions.jsPDF);
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save('answers.pdf');
+    });
+}
+</script> -->
+</html>
