@@ -156,10 +156,8 @@ async def post_form(request: Request, country: str = Form(...), subject: str = F
     - Use bullet points or numbering consistently.
     - Avoid excessive whitespace or long texts.
 
-    
     Generate your output now based on these rules.
     """
-
 
     # # Make the API call to Google Gemini (GenAI)
     # try:
@@ -184,32 +182,67 @@ async def post_form(request: Request, country: str = Form(...), subject: str = F
     except Exception as e:
         raw_quiz = f"Error: {e}"
 
-    # print(repr(raw_quiz[:]))  # Print first 500 chars with escape chars
+    # pattern = r'(Page ?\d+:|Section ?1:|Sektion ?1:)'
+    # pattern1 = re.compile(r'^(Section|Sektion) \d+:$') 
+    # data = re.split(pattern, raw_quiz.strip())
 
-    # Split and render markdown into problem and answer sections
-    # match = re.split(r'(?i)^Page\s*2:.*$', raw_quiz, maxsplit=1, flags=re.MULTILINE)
-    split_match = re.split(r'(Page 2:)', raw_quiz.strip(), maxsplit=1)
-    if len(split_match) >= 3:
-        problem_md = split_match[0].strip()
-        answer_md = (split_match[1] + split_match[2]).strip()  # re-add "Page 2:" prefix
-    else:
-        problem_md = raw_quiz.strip()
-        answer_md = ""
+    # # 要获取所有 Section 1: 加上后面一句内容
+    # results = []
+    # i = 0
+    # while i < len(data):
+    #     item = data[i]
+    #     if isinstance(item, str) and pattern1.match(item.strip()):
+    #         section_title = '✏️ **'+item.strip()
+    #         next_content = data[i + 1] if i + 1 < len(data) else ""
+    #         combined = section_title + next_content
+    #         results.append(combined)
+    #         i += 2  # skip next item
+    #     else:
+    #         i += 1
+    # problem_md = results[0].strip()
+    # answer_md = results[1].strip()  
 
-    # if "Answer Key:" in raw_quiz:
-    #     parts = raw_quiz.split("Answer Key:")
-    #     problem_md = parts[0]
-    #     answer_md = parts[1]
-    # else:
-    #     problem_md = raw_quiz
-    #     answer_md = ""
+    # problem_html = markdown.markdown(problem_md)
+    # answer_html = markdown.markdown(answer_md)
 
+    # 1. 正则表达式匹配分页与小节标题
+    split_pattern = r'(Page ?\d+:|Section ?1:|Sektion ?1:)'
+    section_pattern = re.compile(r'^(Section|Sektion) 1:$')
+
+    # 2. 分割原始文本
+    parts = re.split(split_pattern, raw_quiz.strip())
+
+    # 3. 重组为带前缀的内容块
+    chunks = []
+    for i in range(1, len(parts), 2):  # 从索引1开始，每两个为一组
+        prefix = parts[i].strip()
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ''
+        chunks.append(f"{prefix} {content}")
+
+    # 4. 提取 Section/Sektion 1 内容并加上图标
+    section_1_chunks = []
+    for chunk in chunks:
+        if section_pattern.match(chunk.split()[0] + ' ' + chunk.split()[1]):
+            section_1_chunks.append(f"✏️ **{chunk}**")
+
+    # 5. 提取问题和答案部分（默认第一个为题目，第二个为答案）
+    problem_md = section_1_chunks[0].strip() if len(section_1_chunks) > 0 else ""
+    answer_md = section_1_chunks[1].strip() if len(section_1_chunks) > 1 else ""
+
+    # 6. 转换为 HTML
     problem_html = markdown.markdown(problem_md)
     answer_html = markdown.markdown(answer_md)
 
-    # Fix: unwrap <p> inside <li> to prevent line break issues
-    # problem_html = unwrap_li_paragraphs(problem_html)
-    # answer_html = unwrap_li_paragraphs(answer_html)
+
+
+    # split_match = re.split(r'(Page 2:)', raw_quiz.strip(), maxsplit=1)
+    # if len(split_match) >= 3:
+    #     problem_md = split_match[0].strip()
+    #     answer_md = (split_match[1] + split_match[2]).strip()  # re-add "Page 2:" prefix
+    # else:
+    #     problem_md = raw_quiz.strip()
+    #     answer_md = ""
+
 
     return templates.TemplateResponse("index.html", {
         "request": request,
