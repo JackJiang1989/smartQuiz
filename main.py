@@ -7,10 +7,14 @@ import markdown
 import re
 # from bs4 import BeautifulSoup
 import os
+from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
-
+load_dotenv()  # 加载 .env 文件
+api_key = os.getenv("GENAI_API_KEY")
+client = genai.Client(api_key=api_key)
 # Initialize Google Gemini
-client = genai.Client(api_key="AIzaSyBL5-NfWUKmhamRpnO7OEiMPx2T8bGcaFs")
+# client = genai.Client(api_key="AIzaSyBL5-NfWUKmhamRpnO7OEiMPx2T8bGcaFs")
 
 # Set up app and OpenAI key
 app = FastAPI()
@@ -233,7 +237,15 @@ async def post_form(request: Request, country: str = Form(...), subject: str = F
     problem_html = markdown.markdown(problem_md)
     answer_html = markdown.markdown(answer_md)
 
+    # 处理 HTML，去掉 在<li>里面<p>标签防止换行
+    # soup = BeautifulSoup(html, "html.parser")
 
+    # # Loop through all <li> tags
+    # for li in soup.find_all("li"):
+    #     p = li.find("p")
+    #     if p:
+    #         # Replace the <p> with its inner content
+    #         p.unwrap()
 
     # split_match = re.split(r'(Page 2:)', raw_quiz.strip(), maxsplit=1)
     # if len(split_match) >= 3:
