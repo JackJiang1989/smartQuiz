@@ -8,7 +8,13 @@ import re
 # from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-from bs4 import BeautifulSoup
+
+
+from database import SessionLocal, engine
+from models import Base, RequestLog
+import logging
+
+logger = logging.getLogger("uvicorn.error")
 
 load_dotenv()  # 加载 .env 文件
 api_key = os.getenv("GENAI_API_KEY")
@@ -16,12 +22,50 @@ client = genai.Client(api_key=api_key)
 # Initialize Google Gemini
 # client = genai.Client(api_key="AIzaSyBL5-NfWUKmhamRpnO7OEiMPx2T8bGcaFs")
 
+# This line creates all tables from your models
+Base.metadata.create_all(bind=engine)
 # Set up app and OpenAI key
 app = FastAPI()
 
 # Serve templates and static files
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.middleware("http")
+async def log_request(request: Request, call_next):
+    db = SessionLocal()
+
+    try:
+        log = RequestLog(
+            ip=request.client.host,
+            method=request.method,
+            url=str(request.url),
+            user_agent=request.headers.get("user-agent"),
+            referer=request.headers.get("referer"),
+            accept_language=request.headers.get("accept-language"),
+            content_type=request.headers.get("content-type")
+        )
+        db.add(log)
+        db.commit()
+    except Exception as e:
+        logger.warning(f"Request logging failed: {e}")
+    finally:
+        db.close()
+
+    # Continue request processing
+    response = await call_next(request)
+    return response
+
+
 
 # Landing page
 @app.get("/", response_class=HTMLResponse)

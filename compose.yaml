@@ -1,0 +1,19 @@
+services:
+  python-app:
+    build:
+      context: .
+    container_name: python-app
+    restart: unless-stopped
+    init: true
+    # env_file: ./.env  # Uncomment if .env file exists
+    ports:
+      - "8000:8000"  # Exposes FastAPI app on port 8000
+    # No external dependencies detected (database, cache, etc.)
+    # If you add a database, add it here and set up depends_on
+    # volumes:  # No persistent volumes needed for this app
+    #   - ...
+    # networks:  # Default network is sufficient for a single service
+    #   - app-net
+
+# No external services (database, cache, etc.) detected in the project context or Dockerfile.
+# If you add such services, define them here and add depends_on to python-app as needed.

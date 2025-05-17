@@ -1,0 +1,68 @@
+# 1. Version control
+.git/
+.gitignore
+.hg/
+.svn/
+
+# 2. Python-specific
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+
+# 3. Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 4. Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+
+# 5. IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 6. Build and output directories
+build/
+dist/
+out/
+tmp/
+temp/
+
+# 7. Test and debug artifacts
+test/
+tests/
+debug/
+*.log
+
+# 8. Documentation and markdown
+docs/
+*.md
+README*
+
+# 9. Project-specific and temporary files
+.local/
+local/
+*.tmp
+
+# 10. Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# 11. Node.js/Go/Java (not detected, but included for completeness)
+node_modules/
+npm-debug.log
+yarn-debug.log
+/vendor/
+*.test
+go-cache/
+target/
+*.class
+.gradle/
+
+# Exclude nothing needed for the Python app (main.py, static/, templates/, .html, .css, .ipynb, .txt are all kept)
