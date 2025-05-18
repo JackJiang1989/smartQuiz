@@ -4,5 +4,6 @@ uvicorn
 Jinja2
 markdown
 python-dotenv
-beautifulsoup4
+# beautifulsoup4
 python-multipart
+sqlalchemy

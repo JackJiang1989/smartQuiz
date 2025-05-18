@@ -1,6 +1,6 @@
 from google import genai
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Form, HTTPException, Query
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import markdown
@@ -31,6 +31,14 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+DOWNLOAD_PASSWORD = "bingbing0309"  # 自定义一个密码
+
+@app.get("/download-db")
+async def download_db(pwd: str = Query(...)):
+    if pwd != DOWNLOAD_PASSWORD:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return FileResponse("logs.db", filename="logs.db")
 
 # Dependency to get DB session
 def get_db():
