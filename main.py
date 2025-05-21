@@ -34,6 +34,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 DOWNLOAD_PASSWORD = os.getenv("DOWNLOAD_PASSWORD")
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/download-db")
 async def download_db(pwd: str = Query(...)):
     if pwd != DOWNLOAD_PASSWORD:
