@@ -32,7 +32,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-DOWNLOAD_PASSWORD = "bingbing0309"  # 自定义一个密码
+DOWNLOAD_PASSWORD = os.getenv("DOWNLOAD_PASSWORD")
 
 @app.get("/download-db")
 async def download_db(pwd: str = Query(...)):
